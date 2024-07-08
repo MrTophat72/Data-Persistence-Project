@@ -11,17 +11,30 @@ public class MainManager : MonoBehaviour
     public Rigidbody Ball;
 
     public Text ScoreText;
+    public Text HighScoreText;
     public GameObject GameOverText;
     
     private bool m_Started = false;
     private int m_Points;
-    
+    private string highScoreName;
+    private int highScore;
     private bool m_GameOver = false;
 
     
     // Start is called before the first frame update
     void Start()
     {
+       
+        if (AllManager.Instance.highScoreName != null)
+        {
+            HighScoreText.text = 
+                "Best Score : " + AllManager.Instance.highScoreName + " : " + AllManager.Instance.highScore;
+
+        } else
+        {
+            HighScoreText.text =
+                "Best Score : " + AllManager.Instance.playerName + " : 0";
+        }
         const float step = 0.6f;
         int perLine = Mathf.FloorToInt(4.0f / step);
         
@@ -55,9 +68,24 @@ public class MainManager : MonoBehaviour
         }
         else if (m_GameOver)
         {
+
             if (Input.GetKeyDown(KeyCode.Space))
             {
+                if(m_Points >= AllManager.Instance.highScore) { 
+                    AllManager.Instance.highScore = m_Points;
+                    AllManager.Instance.highScoreName = AllManager.Instance.playerName;
+                    AllManager.Instance.SaveName();
+                }
                 SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+            }else if (Input.GetKeyDown(KeyCode.Escape))
+            {
+                if (m_Points >= AllManager.Instance.highScore)
+                {
+                    AllManager.Instance.highScore = m_Points;
+                    AllManager.Instance.highScoreName = AllManager.Instance.playerName;
+                    AllManager.Instance.SaveName();
+                }
+                SceneManager.LoadScene(0);
             }
         }
     }
@@ -66,6 +94,7 @@ public class MainManager : MonoBehaviour
     {
         m_Points += point;
         ScoreText.text = $"Score : {m_Points}";
+        AllManager.Instance.playerScore = m_Points;
     }
 
     public void GameOver()
